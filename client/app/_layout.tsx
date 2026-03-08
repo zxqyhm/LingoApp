@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import * as SplashScreen from 'expo-splash-screen';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
@@ -10,10 +11,22 @@ import { LanguageProvider } from '@/contexts/LanguageContext';
 
 LogBox.ignoreLogs([
   "TurboModuleRegistry.getEnforcing(...): 'RNMapsAirModule' could not be found",
-  // 添加其它想暂时忽略的错误或警告信息
+  // 添加其他想要忽略的警告信息
 ]);
 
 export default function RootLayout() {
+  useEffect(() => {
+    const prepare = async () => {
+      try {
+        // 隐藏启动屏
+        await SplashScreen.hideAsync();
+      } catch (e) {
+        console.warn('启动屏隐藏失败:', e);
+      }
+    };
+    prepare();
+  }, []);
+
   return (
     <AuthProvider>
       <LanguageProvider>
@@ -21,7 +34,7 @@ export default function RootLayout() {
           <GestureHandlerRootView style={{ flex: 1 }}>
             <StatusBar style="dark"></StatusBar>
             <Stack screenOptions={{
-              // 设置所有页面的切换动画为从右侧滑入，适用于iOS 和 Android
+              // 设置所有页面的切换动画为从右侧滑入，适用于 iOS 和 Android
               animation: 'slide_from_right',
               gestureEnabled: true,
               gestureDirection: 'horizontal',

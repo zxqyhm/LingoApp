@@ -23,23 +23,29 @@ jobs:
         with:
           version: 9.0.0
 
+      - name: Install Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
       - name: Install dependencies
         run: |
           cd client
           pnpm install --no-frozen-lockfile
 
-      - name: Install EAS CLI globally
-        run: npm install -g eas-cli
+      - name: Prebuild
+        run: |
+          cd client
+          npx expo prebuild --platform android --clean
 
       - name: Build APK
         run: |
-          cd client
-          eas build --platform android --profile preview --non-interactive
-        env:
-          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          cd client/android
+          ./gradlew assembleDebug --no-daemon
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: app-debug
-          path: client/*.apk
+          path: client/android/app/build/outputs/apk/debug/app-debug.apk
